@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script>
+//This is our list of variables to be used throughout the functions that create this strange game
+var board = boardMaker10x10();
+var red = [0,0,0];
+var column = 0;//This will be used for the x coordinate of the red array
+var row = 1;//This will be used for the y coordinate of the red array
+var round = 2;//This will be used to access the round part of the red array
+var didRedWin = 1;//This will be used for a flag for a while loop to move red around the board
+board[0][9] = 1;//This signifies the beginning of the game as we have placed red on the bottom left corner
+red[row] = 9;//This places the row coordinate of red as 9	
+function clear()//This will clear all of the globals at the end of each simulation
+{
+	//This initializes all globals back to their default values so that the game can be run again
+	board = boardMaker10x10();
+	red = [0,0,0];
+	column = 0;
+	row = 1;
+	round = 2;
+	didRedWin = 1;
+	board[0][9] = 1;
+	red[row] = 9;
+}
+function strangeGame()//This will play our strange game of moving red around a 10x10 board
+{
+
+	
+	while(didRedWin && (red[round] < 1000000))//This will allow the loop to run exactly 1,000,000 times and will exit on the 1,000,001th time.
+	{
+		moveRed();//This will move red either to a new location and increase the round counter
+		if(red[column] == 9 && red[row] == 0)//This checks if 
+		{
+			didRedWin = 0;//This changes the value of didRedWin to 0 so that the while loop stops iterating 
+			document.getElementById('p1').innerHTML = "Red has successfully reached the target destination.</br>Red attempted to move " + (red[round]).toString() + " times.";//This lets the user know that the game completed properly and that red did infact win 
+ 		}	
+		
+
+	}
+	
+	if(red[round] == 1000000)//This only happens if we some how complete 1million rounds without red winning
+	{
+		document.getElementById('p1').innerHTML = "Red has unsuccessful in reaching its destination";//This let the user know that red has lost the game
+	}
+	//******************************************************************************************************************************************************
+	//************************************Now that the game is over we will begin to process the statistics about our game**********************************
+	//******************************************************************************************************************************************************
+	
+	//***This block of code finds the maximum number of touches
+	var max = 0;//This will house the maximum number of touches 
+	for(var i = 0; i < 10; i++)//This set of loops will find our number of touches to a square
+	{
+		for(var j = 0; j < 10; j++)
+		{
+			if(board[i][j] > max)//This checks if the number of touchs to that space of the board is larger than our current max
+			{
+				max = board[i][j];//This changes the max to the new max found
+			}
+		}
+	}
+	//***This block of code finds the minimum number of touches
+	var min = max;//This will house the minimum number of touches. We initialize it to the maximum number of touches so that our following for loop will work properly 
+	for(var i = 0; i < 10; i++)//This set of loops will find our number of touches to a square
+	{
+		for(var j = 0; j < 10; j++)
+		{
+			if(board[i][j] < min)//This checks if our current number of touches is smaller than our current minimum
+			{
+				min = board[i][j];//This changes our min to the newly found smaller number.
+			}
+		}
+	}
+	//***This block of code finds the average number of touches
+	var totalTouches = 0;//This variable will be used to house total touches
+	var average = 0;//This variable will be used to house average touches to any 1 square. This will be calulcated by total touches / 100 squares in the grid
+	for(var i = 0; i < 10; i++)//This set of loops will find our number of touches to a square
+	{
+		for(var j = 0; j < 10; j++)
+		{
+			totalTouches += board[i][j];//This pulls the touches from the board and adds them into the total touches
+		}
+	}
+	average = totalTouches / 100;//This will store the average touches to a square in the grid to its appropriate variable.
+	
+	
+	//***Now that all of the required statistics have been processed we will now display them in the p2 tag of our html page
+	document.getElementById('p2').innerHTML = "The maximum number of touches was: " + max + "</br>The minimum number of touches was: " + min + "</br>The average number of touches was: " + average;
+  	
+	clear();//This clears all globals
+	document.getElementById("b1").innerHTML="Click Here To Run Simulation Again"; 
+	
+}
+
+function boardMaker10x10()//This will make a 10x10 board to play this strange game on 
+{
+	var array = [];
+
+	for(var i=0;i<10;i++)//This generates a 2D array it is referenced Column then Row 
+	{
+     array[i] = [];
+	}
+	for(var i=0;i<10;i++)//This fills the board with 0s
+	{
+		for(var j=0;j<10;j++)
+		{
+			array[i][j] = 0;
+		}
+	}
+	return array;
+}
+function moveRed()//This function will move red either up, down, left, or right 0,1,or 2 spaces
+{
+	direction = pickDirection();//This will grab a direction
+	numSteps = pickSteps();//This will pick how far red will move
+	if(direction == 1)//we move up
+	{
+		var tempRow = red[row];//This holds the row coordinate 
+		tempRow -= pickSteps();//This will generate the movement of red in the upward direction
+		if(isValidMove10x10(tempRow))
+		{
+			red[round] += 1;//This increases the round counter as a round ends when red moves
+			red[row] = tempRow;//we now change the row position of red in the upwards direction 
+		}
+		else
+		{
+			red[round] += 1;//we still increase the round counter even if we didn't move  
+		}
+	}
+	else if(direction == 2)//we move right
+	{
+		var tempColumn = red[column];//This takes the current column coordinate of red and puts it in a temp var
+		tempColumn += pickSteps();//This will generate the movement of red in the right direction
+		if(isValidMove10x10(tempColumn))
+		{
+			red[round] += 1;//This increase the round counter as the round ends when red moves
+			red[column] = tempColumn;//This will change the column of red in the right direction 
+		}
+		else
+		{
+			red[round] += 1;//This increase the round counter even if we didn't move
+		}
+	}
+	else if(direction == 3)//we move down
+	{
+		var tempRow = red[row];//This holds the row coordinate 
+		tempRow += pickSteps();//This will generate the movement of red in the downward direction
+		if(isValidMove10x10(tempRow))
+		{
+			red[round] += 1;//This increases the round counter as a round ends when red moves
+			red[row] = tempRow;//we now change the row position of red in the downward direction 
+		}
+		else
+		{
+			red[round] += 1;//we still increase the round counter even if we didn't move  
+		}
+	
+	}
+	else if(direction == 4)//we move left
+	{
+		var tempColumn = red[column];//This takes the current column coordinate of red and puts it in a temp var
+		tempColumn -= pickSteps();//This will generate the movement of red in the left direction
+		if(isValidMove10x10(tempColumn))
+		{
+			red[round] += 1;//This increase the round counter as the round ends when red moves
+			red[column] = tempColumn;//This will change the column of red in the left direction 
+		}
+		else
+		{
+			red[round] += 1;//This increase the round counter even if we didn't move
+		}	
+	}
+	
+	board[red[column]][red[row]] += 1;//This increments the board that houses all of the data for where red has landed on the square red is now on.
+
+}
+function pickDirection()//1 is up 2 is right 3 is down 4 is right
+{
+	return Math.floor((Math.random()*4)+1);
+}
+function pickSteps()//This picks the number of steps
+{
+	return Math.floor((Math.random()*2));
+}
+function isValidMove10x10(num)//this will be used as our bounds checker for a 10x10 board
+{
+	if(num < 10 && num >= 0)
+		return true;
+	else
+		return false;
+}
+</script>
+</head>
+
+<body>
+<h2>Strange Game Simulator</h2>
+<br>
+<button id = "b1" type="button" onclick=strangeGame()>Click Here To Run Simulation</button>
+<p id = "p1" ></p>
+<p id = "p2" ></p>
+</body>
+</html>
