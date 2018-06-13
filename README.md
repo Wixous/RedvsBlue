@@ -1,5 +1,11 @@
 # RedvsBlue
-Project from Introduction to Software Developement 
+Author: Ian Rodden
+Date Last edited: 8/25/2017
+Class this is for: CS 4500, Fall 2017
+Language coded in: JavaScript
+Title: A pretty strange game
+Version 1.0
+
 TO RUN THIS CODE: Copy and paste it in its entirety into w3schools' JavaScript environment found at: https://www.w3schools.com/js/tryit.asp?filename=tryjs_myfirst
 You will need to first delete the code found in the left hand pane. Then you will paste this entire document into the left hand pane. Then you will click the run button 
 that is right above this left hand pane. Following that you can click the button that now appears in the right hand pane to run this programs simulation.
@@ -38,4 +44,4 @@ When your simulation finishes, it should print to the screen this information, a
 2.  Keep track of how many times either of the markers landed in a particular cell (we’ll call that a “touch”).  
 A touch includes the starting cell, and wherever a move finishes. What was the maximum number of touches for any cell? What was the minimum number of times a cell was touched? 
 What is the average number of touches to a grid cell? The minimum and maximum should be non-negative integers; the average should be a positive real. 
-(Note: the minimum and maximum may occur on multiple cells in the grid; that’s fine.)
+(Note: the minimum and maximum may occur on multiple cells in the grid; that’s fine.) 
