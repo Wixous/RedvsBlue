@@ -1,9 +1,14 @@
 # RedvsBlue
 Author: Ian Rodden
+
 Date Last edited: 8/31/2017
+
 Class this is for: CS 4500, Fall 2017
+
 Language coded in: JavaScript
+
 Title: A pretty strange game
+
 Version 2.0
 
 TO RUN THIS CODE: Copy and paste it in its entirety into w3schools' JavaScript environment found at: https://www.w3schools.com/js/tryit.asp?filename=tryjs_myfirst
