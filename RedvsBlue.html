@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script>
+//This is our list of variables to be used throughout the functions that create this strange game
+var board;//This will be used to house our statistics 
+var red = [0,0,0];//This is our board piece 
+var column = 0;//This will be used for the x coordinate of the red array
+var row = 1;//This will be used for the y coordinate of the red array
+var round = 2;//This will be used to access the round part of the red array
+var didRedWin = 1;//This will be used for a flag for a while loop to move red around the board
+var userColumn = 0;//This will be used for the variable number of columns from the user
+var userRow = 0;//This will be used for the variable number of rows from the user
+var canvas;//This will be used to house our board 
+var pieceFlag = false;//This is a flag to show if our piece is visable or not
+var pieceCtx;//This will be the variable for our red marker on the board
+var timeOut;//This will house our id for the timeout we use throughout our game
+var gameSpeed;//This will house our speed at which we play the game
+function clear()//This will clear all of the globals at the end of each simulation
+{
+	//This initializes all globals back to their default values so that the game can be run again
+	board = boardMaker();
+	red = [0,0,0];
+	column = 0;
+	row = 1;
+	round = 2;
+	didRedWin = 1;
+	document.getElementById("p1").innerHTML = "";
+	document.getElementById("p2").innerHTML = "";
+}
+function strangeGame()//This function plays the game for us by calling moveRed to move the piece around the board and then calling itself again to repeat the process
+{
+	if((didRedWin) && red[round] < 1000000)//This conditional checks if red has won the game or if we have reached 1,000,000 attempts to move
+	{	
+		timeOut = setTimeout(function()//This set timeout function moves red around the board and calls play game again this is so that we can watch it move around the board
+		{
+			moveRed()//This moves red around the board
+			strangeGame();//This calls play game again
+		},gameSpeed);
+	}
+	if(red[round] == 1000000)//This only happens if we some how complete 1million rounds without red winning
+	{
+		document.getElementById('p1').innerHTML = "Red has unsuccessful in reaching its destination";//This let the user know that red has lost the game
+	}
+}
+function statistics()//This function builds all of the statistics used 
+{	
+	//***This block of code finds the maximum number of touches
+	var max = 0;//This will house the maximum number of touches 
+	for(var i = 0; i < userColumn; i++)//This set of loops will find our number of touches to a square
+	{
+		for(var j = 0; j < userRow; j++)
+		{
+			if(board[i][j] > max)//This checks if the number of touchs to that space of the board is larger than our current max
+			{
+				max = board[i][j];//This changes the max to the new max found
+			}
+		}
+	}
+	//***This block of code finds the minimum number of touches
+	var min = max;//This will house the minimum number of touches. We initialize it to the maximum number of touches so that our following for loop will work properly 
+	for(var i = 0; i < userColumn; i++)//This set of loops will find our number of touches to a square
+	{
+		for(var j = 0; j < userRow; j++)
+		{
+			if(board[i][j] < min)//This checks if our current number of touches is smaller than our current minimum
+			{
+				min = board[i][j];//This changes our min to the newly found smaller number.
+			}
+		}
+	}
+	//***This block of code finds the average number of touches
+	var totalTouches = 0;//This variable will be used to house total touches
+	var average = 0;//This variable will be used to house average touches to any 1 square. This will be calulcated by total touches / 100 squares in the grid
+	for(var i = 0; i < userColumn; i++)//This set of loops will find our number of touches to a square
+	{
+		for(var j = 0; j < userRow; j++)
+		{
+			totalTouches += board[i][j];//This pulls the touches from the board and adds them into the total touches
+		}
+	}
+	average = totalTouches / (userColumn * userRow);//This will store the average touches to a square in the grid to its appropriate variable.
+	
+	
+	//***Now that all of the required statistics have been processed we will now display them in the p2 tag of our html page
+	document.getElementById('p2').innerHTML = "The maximum number of touches was: " + max + "</br>The minimum number of touches was: " + min + "</br>The average number of touches was: " + average;
+}
+function boardMaker()//This will make a board of size defined by the user 
+{
+	var array = [];
+
+	for(var i=0;i<userColumn;i++)//This generates a 2D array it is referenced Column then Row 
+	{
+     array[i] = [];
+	}
+	for(var i=0;i<userColumn;i++)//This fills the board with 0s
+	{
+		for(var j=0;j<userRow;j++)
+		{
+			array[i][j] = 0;
+		}
+	}
+	return array;
+}
+function moveRed()//This function will move red either up, down, left, or right 0,1,or 2 spaces
+{
+	if(red[column] == (userColumn - 1) && red[row] == 0)//This checks if red has won the game
+	{
+		didRedWin = 0;//This changes the value of didRedWin to 0 so that we can stop our recursive call up in strange game 
+		statistics();//This calls our stats function to display all of the stats about our game
+		document.getElementById('p1').innerHTML = "Red has successfully reached the target destination.</br>Red attempted to move " + (red[round]).toString() + " times.";//This lets the user know that the game completed properly and that red did infact win 
+		endableUserInput();//This enables the page for user input now that the game has reached completion
+		return;
+ 	}
+	
+	if(red[round] == 1000000)//This only happens if we some how complete 1million rounds without red winning
+	{
+		document.getElementById('p1').innerHTML = "Red has unsuccessful in reaching its destination";//This let the user know that red has lost the game
+	}
+	
+	direction = pickDirection();//This will grab a direction
+	numSteps = pickSteps();//This will pick how far red will move
+	if(direction == 1)//we move up
+	{
+		var tempRow = red[row];//This holds the row coordinate 
+		tempRow -= pickSteps();//This will generate the movement of red in the upward direction
+		if(isValidMoveUpDown(tempRow))
+		{
+			clearPiece();//This clears the previously placed piece on the board
+			red[round] += 1;//This increases the round counter as a round ends when red moves
+			red[row] = tempRow;//we now change the row position of red in the upwards direction 
+			drawPiece();//This draws the piece on the board
+		}
+		else
+		{
+			red[round] += 1;//we still increase the round counter even if we didn't move  
+		}
+	}
+	else if(direction == 2)//we move right
+	{
+		var tempColumn = red[column];//This takes the current column coordinate of red and puts it in a temp var
+		tempColumn += pickSteps();//This will generate the movement of red in the right direction
+		if(isValidMoveSideways(tempColumn))
+		{
+			clearPiece();//This clears the previously placed piece on the board
+			red[round] += 1;//This increase the round counter as the round ends when red moves
+			red[column] = tempColumn;//This will change the column of red in the right direction 
+			drawPiece();//This draws the piece on the board
+		}
+		else
+		{
+			red[round] += 1;//This increase the round counter even if we didn't move
+		}
+	}
+	else if(direction == 3)//we move down
+	{
+		var tempRow = red[row];//This holds the row coordinate 
+		tempRow += pickSteps();//This will generate the movement of red in the downward direction
+		if(isValidMoveUpDown(tempRow))
+		{
+			clearPiece();//This clears the previously placed piece on the board
+			red[round] += 1;//This increases the round counter as a round ends when red moves
+			red[row] = tempRow;//we now change the row position of red in the downward direction
+			drawPiece();//This draws the piece on the board 			
+		}
+		else
+		{
+			red[round] += 1;//we still increase the round counter even if we didn't move  
+		}
+	
+	}
+	else if(direction == 4)//we move left
+	{
+		var tempColumn = red[column];//This takes the current column coordinate of red and puts it in a temp var
+		tempColumn -= pickSteps();//This will generate the movement of red in the left direction
+		if(isValidMoveSideways(tempColumn))
+		{
+			clearPiece();//This clears the previously placed piece on the board
+			red[round] += 1;//This increase the round counter as the round ends when red moves
+			red[column] = tempColumn;//This will change the column of red in the left direction
+			drawPiece();//This draws the piece on the board 
+		}
+		else
+		{
+			red[round] += 1;//This increase the round counter even if we didn't move
+		}	
+	}
+
+	board[red[column]][red[row]] += 1;//This increments the board that houses all of the data for where red has landed on the square red is now on.
+
+}
+function pickDirection()//1 is up 2 is right 3 is down 4 is right
+{
+	return Math.floor((Math.random()*4)+1);
+}
+function pickSteps()//This picks the number of steps
+{
+	return Math.floor((Math.random()*2));
+}
+function isValidMoveSideways(num)//this will be used as our bounds checker for a 10x10 board
+{
+	if(num < userColumn && num >= 0)
+		return true;
+	else
+		return false;
+}
+function isValidMoveUpDown(num)//this will be used as our bounds checker for a 10x10 board
+{
+	if(num < userRow && num >= 0)
+		return true;
+	else
+		return false;
+}
+function disableUserInput()//This function disables the page from user input during game play
+{
+	document.getElementById("b1").innerHTML="Simulation Currently In Progress";//This changes our buttons text to show the user that it is currently running
+	//***These statements disable all areas on the page that allow the user to provide input for the simulation
+	document.getElementById("b1").disabled = true;//This is the button
+	document.getElementById("r1").disabled = true;//This is the rows field
+	document.getElementById("c1").disabled = true;//This is the columns field
+	document.getElementById("slow").disabled = true;//This is one of the radio button
+	document.getElementById("normal").disabled = true;//This is one of the radio button
+	document.getElementById("fast").disabled = true;//This is one of the radio button
+	document.getElementById("lightning").disabled = true;//This is one of the radio button
+	document.getElementById("gl").disabled = true;//This is one of the radio button
+	
+}
+function endableUserInput()//This function enables the page for user input after the simulation has ended
+{
+	document.getElementById("b1").innerHTML="Click Here To Run Simulation Again"; //This changes the button to tell the user to click here to run it again
+	//**These statements enable all of the areas that allow users to provide input for the simulation
+	document.getElementById("b1").disabled = false;//This is the button
+	document.getElementById("r1").disabled = false;//This rows field
+	document.getElementById("c1").disabled = false;//This is the columns field
+	document.getElementById("slow").disabled = false;//This is one of the radio button
+	document.getElementById("normal").disabled = false;//This is one of the radio button
+	document.getElementById("fast").disabled = false;//This is one of the radio button
+	document.getElementById("lightning").disabled = false;//This is one of the radio button
+	document.getElementById("gl").disabled = false;//This is one of the radio button
+}
+function initializeGame()
+{
+	clear();//This sets all of the global variables to their default values
+	clearTimeout(timeOut);//This clears out the setTimeout function calls on the stack from the previous game 
+	var form = document.getElementById("f1");//This grabs our form element
+	userColumn = Math.floor(form.elements[0].value);//This puts the value of the user defined columns into our variable
+	userRow = Math.floor(form.elements[1].value);//This puts the value of the user defined rows into our variable
+	//**This part of the code grabs the speed that the user chose to play the game
+	if (document.getElementById("slow").checked)//This checks if the user selected slow
+	{
+		gameSpeed = 500;
+	}
+	else if (document.getElementById("normal").checked) //This checks if the user selected normal
+	{
+		gameSpeed = 250;
+	}
+	else if (document.getElementById("fast").checked) //This checks if the user selected fast
+	{
+		gameSpeed = 100;
+	}
+	else if (document.getElementById("lightning").checked) //This checks if the user selected lightening
+	{
+		gameSpeed = 30;
+	}
+	else if (document.getElementById("gl").checked) //This checks if the user selected lightening
+	{
+		gameSpeed = 0;
+	}
+	if(userColumn >= 5 && userColumn <= 20 && userRow >= 5 && userRow <= 20)//This checks if the user gave us valid numbers to work with
+	{
+		disableUserInput();//This turns off the page for user input until the game has completed 
+		document.getElementById('error').innerHTML = "";//This clears the error paragraph incase it was filled with an error message to the user
+		drawBoard();//This draws the board for us to play the game on
+		//***This part initializes the marker and stats board and places red onto our drawn grid
+		board = boardMaker();//This will intialize our board that holds our stats on moves
+		board[0][userRow-1] = 1;//This signifies the beginning of the game as we have placed red on the bottom left corner
+		red[row] = userRow - 1;//This sets reds coordinates to the correct location
+		drawPiece();//This puts the our marker onto our grid
+		
+		strangeGame();//This starts up the actual game being played
+	}
+	else//if they gave bad input it does nothing
+		document.getElementById('error').innerHTML = "Please provide valid numbers for simulation.";
+	
+
+}
+function drawBoard()//This function draws our board for the simulations
+{
+	canvas = document.getElementById('cv');//This grabs the a canvas element from the dom 
+	canvas.width = (20 * userColumn);//This sets the width based off of number of columns
+	canvas.height = (20 * userRow);//This sets the height based off of the number of rows
+	var ctx = canvas.getContext("2d");//This variable that will be used to reference the area inside of the canvas
+	ctx.clearRect(0, 0, canvas.width, canvas.height);//This will ensure we start with a 100% clean canvas
+	var columnSpace = 20;//This will be used to house the space between columns
+	var rowSpace = 20;//This will be used to house the space between rows
+	for (var i = 0; i <= canvas.width; i += columnSpace)//draws vertical lines
+	{ 
+		ctx.beginPath();//This will begin the path of stroking
+		ctx.moveTo(i,0);//This will move us to where we need to draw a line
+		ctx.lineTo(i,canvas.height);//This create the line for us
+		ctx.strokeStyle = "#000000";//This makes the stroke black
+		ctx.stroke();//This will do the actual drawing of the line onto the canvas
+		ctx.closePath();//This closes the path of stroking
+	}
+	for (var i = 0; i <= canvas.height; i += rowSpace)//draws horizonal lines
+	{  
+		ctx.beginPath();//This will begin the path of stroking
+		ctx.moveTo(0, i);//This will move us to where we need to draw a line
+		ctx.lineTo(canvas.width, i);//This will crease the line for us
+		ctx.strokeStyle = "#000000";//This makes the stroke black
+		ctx.stroke();//This will do the actual drawing of the line onto the canvas
+		ctx.closePath();//This closes the path of stroking
+	}	
+}
+function drawPiece()//This will draw our piece on the board 
+{ 
+	pieceCtx = canvas.getContext("2d");//This will be what we draw on for the 
+	//***This calculates the x and y position of the piece 
+	var yCoordinate = (red[row] * 20) + 10;//This will generate the x coordinate based on the where red is we take the number of pixels per column + half the column
+	var xCoordinate = (red[column] * 20) + 10;//This will generate the y coordinate based on where red is we take the number of pixels per column + half the column 
+	//***This code will draw a red circle 
+	pieceCtx.beginPath();//This begins our stroke path
+	pieceCtx.arc(xCoordinate, yCoordinate, 8, 0, 2*Math.PI);//This draws the arc that will become our circle
+	pieceCtx.fillStyle = "#ff0000";//This sets the fill style to red so that our circle is a red dot
+	pieceCtx.fill();//This sets fill stroke to true so that the dot is actually filled
+	pieceCtx.strokeStyle = "#ff0000";//This sets the stroke to a red colour so that the dot doesn't have a border 
+	pieceCtx.stroke();//This actually does all of the actual stroking now that we have 
+	pieceCtx.closePath();//This closes our stroke path
+	pieceFlag = true;//This sets that there is actually a piece on the board
+}
+function clearPiece()//This will clear our piece off of the board
+{
+	if(pieceFlag == true)
+	{
+		var yCoordinate = (red[row] * 20) + 10;//This will generate the x coordinate based on the where red is we take the number of pixels per column + half the column
+		var xCoordinate = (red[column] * 20) + 10;//This will generate the y coordinate based on where red is we take the number of pixels per column + half the column 
+		//***This code will draw a white rectangle over our old red piece 
+		pieceCtx.beginPath();//This begins our stroke path
+		pieceCtx.clearRect(xCoordinate - 9, yCoordinate - 9, 18, 18);//This will clear a rectangle the size of the circle
+		pieceFlag = false;//This sets that there is actually a piece on the board
+	}
+}
+</script>
+</head>
+
+<body>
+<h2>Strange Game Simulator</h2>
+<p>
+	This is the Strange Game Simulator. In this simulation a red dot will move around a grid in a random fashion.<br>
+	The dot will begin in the bottom left hand corner of a grid size determined by you, and then move randomly, either<br>
+	up, down, left, or right. The red dot will also have a random chance to move either 0, 1, or 2 spaces at a time.<br>
+	This will continue until the red dot has reacher the upper right hand corner of the grid or has attempted to move<br>
+	1,000,000 times. Once either of these conditions have been met the game will terminate, and you will be given<br>
+	statistics about the game. These will statistics will include the average amount of touches per board square, total<br>
+	attempts to move, minimum number of touches to a square, and maximum number of touches to a square.<br>
+	**Note** Once the simulation has begun nothing can be changed, and it will only stop once it has finished running.
+</p>
+<button id = "b1" type="button" onclick=initializeGame()>Click Here To Run Simulation</button><br><br>
+<form id = "f1">
+	Please enter a number of columns between 5 and 20 inclusively(decimal numbers will be floored):
+	<input type="number" name="column" id = "c1" value = "5" min="5" max="20" ><br>
+	Please enter a number of rows between 5 and 20 inclusively(decimal numbers will be floored):
+	<input type="number" name="row" id = "r1" value = "5" min="5" max="20" ><br>
+	Please selete a speed for the simulation: 
+    <input type="radio" name="speed" id = "slow">Slow
+	<input type="radio" name="speed" id = "normal" checked = "checked">Normal
+    <input type="radio" name="speed" id = "fast">Fast
+    <input type="radio" name="speed" id = "lightning">Lightning
+	<input type="radio" name="speed" id = "gl">God Like<br>
+	**WARNING** Larger game boards may lead to extremely long simulations
+</form>
+<p id = "error" ></p>
+<canvas id = "cv">Your browser does not support the canvas element.</canvas>
+<p id = "p1" ></p>
+<p id = "p2" ></p>
+</body>
+</html>
