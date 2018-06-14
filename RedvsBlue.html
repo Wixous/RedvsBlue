@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script>
+//This is our list of variables to be used throughout the functions that create this strange game
+var board;//This will be used to house our statistics 
+var red = [0,0,0,0];//This is our red piece 
+var blue = [0,0,0,0];//This is our blue piece
+var column = 0;//This will be used for the x coordinate of the arrays
+var row = 1;//This will be used for the y coordinate of the arrays
+var round = 2;//This will be used to access the round part of the arrays
+var sentHome = 3;//This will be used to access the sentHome part of the arrays
+var didRedWin = 1;//This will be used for a flag for a while loop to move red around the board
+var didBlueWin = 1;//This will be used for a flag for a while loop to move red around the board
+var userColumn = 0;//This will be used for the variable number of columns from the user
+var userRow = 0;//This will be used for the variable number of rows from the user 
+var gameNum = 5000;//This will be the number of games we run for the simulation
+var numRoundsEx1 = [];//This will house our number of rounds to win the game in experiment 1
+var numRoundsEx2 = [];//This will house our number of rounds to win the game in experiment 2
+var numRoundsEx3 = [];//This will house our number of rounds to win the game in experiment 3
+var numRoundsEx4 = [];//This will house our number of rounds to win the game in experiment 4
+//******These are included incase anyone wants to implement a who won more often feature at a later date
+var whoWonEx1 = [];//This will house who won the game each time it is played in experiment 1
+var whoWonEx2 = [];//This will house who won the game each time it is played in experiment 2
+var whoWonEx3 = [];//This will house who won the game each time it is played in experiment 3
+var whoWonEx4 = [];//This will house who won the game each time it is played in experiment 4
+function clear()//This will clear all of the globals at the end of each simulation
+{
+	//This initializes all globals back to their default values so that the game can be run again
+	blue = [0,0,0,0];
+	red = [0,0,0,0];
+	column = 0;
+	row = 1; 
+	round = 2;
+	didBlueWin = 1;
+	didRedWin = 1;
+	document.getElementById("p1").innerHTML = "";
+}
+function strangeGame()//This function plays the game for us by calling moveRed to move the piece around the board and then calling itself again to repeat the process
+{
+	for(var i =0; i < gameNum; i++)//****************Experiment 1**************************
+	{
+		while((blue[round] < 1000000) && didBlueWin && didRedWin)
+		{
+			moveRed();
+			moveBlue();
+		}
+		if(red[round] == 1000000)//This only happens if we some how complete 1million rounds without red winning
+		{
+			document.getElementById('p1').innerHTML = "Red was unsuccessful in reaching its destination";//This let the user know that red has lost the game
+		}
+		else if(blue[round] == 1000000)//This only happens if we some how complete 1million rounds without red winning
+		{
+			document.getElementById('p1').innerHTML = "Blue was unsuccessful in reaching its destination";//This let the user know that red has lost the game
+		}
+		else if(red[round] == 1000000 && blue[round] == 1000000)//This only happens if we some how complete 1million rounds without red winning
+		{
+			document.getElementById('p1').innerHTML = "Red and Blue have been unsuccessful in reaching their destination";//This let the user know that red has lost the game
+		}
+		if(didBlueWin)//This will be true if red won the game
+		{
+			whoWonEx1[i] = "red";//This sets the who won to red
+			numRoundsEx1[i] = red[round];//This grabs the number of rounds played
+		}
+		if(didRedWin)
+		{
+			whoWonEx1[i] = "blue";//This sets the winner to blue
+			numRoundsEx1[i] = red[round];//this grabs the number of rounds played
+		}
+		clear();
+	}
+	
+	for(var i =0; i < gameNum; i++)//*************************Experiment 2**********************
+	{
+		while((blue[round] < 1000000) && didBlueWin && didRedWin)
+		{
+			moveRedDiagonally();
+			moveBlueDiagonally();
+		}
+		if(red[round] == 1000000)//This only happens if we some how complete 1million rounds without red winning
+		{
+			document.getElementById('p1').innerHTML = "Red was unsuccessful in reaching its destination";//This let the user know that red has lost the game
+		}
+		else if(blue[round] == 1000000)//This only happens if we some how complete 1million rounds without red winning
+		{
+			document.getElementById('p1').innerHTML = "Blue was unsuccessful in reaching its destination";//This let the user know that red has lost the game
+		}
+		else if(red[round] == 1000000 && blue[round] == 1000000)//This only happens if we some how complete 1million rounds without red winning
+		{
+			document.getElementById('p1').innerHTML = "Red and Blue have been unsuccessful in reaching their destination";//This let the user know that red has lost the game
+		}
+		if(didBlueWin)//This will be true if red won the game
+		{
+			whoWonEx2[i] = "red";//This sets the who won to red
+			numRoundsEx2[i] = red[round];//This grabs the number of rounds played
+		}
+		if(didRedWin)
+		{
+			whoWonEx2[i] = "blue";//This sets the winner to blue
+			numRoundsEx2[i] = red[round];//this grabs the number of rounds played
+		}
+		clear();
+	}
+	
+	for(var i =0; i < gameNum; i++)//********************Experiment 3*******************************
+	{
+		while((blue[round] < 1000000) && didBlueWin && didRedWin)
+		{
+			if(pickDirection4Way() == 1 || pickDirection4Way() == 3)//This gives a 50% chance that red will move in a cardinal direction
+				moveRed();
+			else//This will move red in diagonal direction instead of a cardinal direction
+				moveRedDiagonally();
+			
+			if(pickDirection4Way() == 1 || pickDirection4Way() == 3)//This gives a 50% chance that blue will move in a cardinal direction
+				moveBlue();
+			else//This will move blue in diagonal direction instead of a cardinal direction
+				moveBlueDiagonally();	
+			
+		}
+		if(red[round] == 1000000)//This only happens if we some how complete 1million rounds without red winning
+		{
+			document.getElementById('p1').innerHTML = "Red was unsuccessful in reaching its destination";//This let the user know that red has lost the game
+		}
+		else if(blue[round] == 1000000)//This only happens if we some how complete 1million rounds without red winning
+		{
+			document.getElementById('p1').innerHTML = "Blue was unsuccessful in reaching its destination";//This let the user know that red has lost the game
+		}
+		else if(red[round] == 1000000 && blue[round] == 1000000)//This only happens if we some how complete 1million rounds without red winning
+		{
+			document.getElementById('p1').innerHTML = "Red and Blue have been unsuccessful in reaching their destination";//This let the user know that red has lost the game
+		}
+		if(didBlueWin)//This will be true if red won the game
+		{
+			whoWonEx3[i] = "red";//This sets the who won to red
+			numRoundsEx3[i] = red[round];//This grabs the number of rounds played
+		}
+		if(didRedWin)
+		{
+			whoWonEx3[i] = "blue";//This sets the winner to blue
+			numRoundsEx3[i] = red[round];//this grabs the number of rounds played
+		}
+		clear();
+	}
+	for(var i =0; i < gameNum; i++)//****************************Experiment 4************************
+	{
+		while((blue[round] < 1000000) && didBlueWin && didRedWin)
+		{
+			moveRedDiagonally();
+			moveBlue();
+		}
+		if(red[round] == 1000000)//This only happens if we some how complete 1million rounds without red winning
+		{
+			document.getElementById('p1').innerHTML = "Red was unsuccessful in reaching its destination";//This let the user know that red has lost the game
+		}
+		else if(blue[round] == 1000000)//This only happens if we some how complete 1million rounds without red winning
+		{
+			document.getElementById('p1').innerHTML = "Blue was unsuccessful in reaching its destination";//This let the user know that red has lost the game
+		}
+		else if(red[round] == 1000000 && blue[round] == 1000000)//This only happens if we some how complete 1million rounds without red winning
+		{
+			document.getElementById('p1').innerHTML = "Red and Blue have been unsuccessful in reaching their destination";//This let the user know that red has lost the game
+		}
+		if(didBlueWin)//This will be true if red won the game
+		{
+			whoWonEx4[i] = "red";//This sets the who won to red
+			numRoundsEx4[i] = red[round];//This grabs the number of rounds played
+		}
+		if(didRedWin)
+		{
+			whoWonEx4[i] = "blue";//This sets the winner to blue
+			numRoundsEx4[i] = red[round];//this grabs the number of rounds played
+		}
+		clear();
+	}
+	statistics();
+}
+function statistics()//This function draws our histogram for what our experiments
+{	
+	var trace1 = {
+	x: numRoundsEx1,
+	type: "histogram",
+	opacity: 1.0,
+	marker: {
+     color: 'green',
+	},
+	name: "Experiment 1"
+	};
+	var trace2 = {
+	x: numRoundsEx2,
+	type: "histogram",
+	opacity: 1,
+	marker: {
+     color: 'yellow',
+	},
+	name: "Experiment 2"
+	};
+	var trace3 = {
+	x: numRoundsEx3,
+	type: "histogram",
+	opacity: 1,
+	marker: {
+     color: 'blue',
+	},
+	name: "Experiment 3"
+	};
+	var trace4 = {
+	x: numRoundsEx4,
+	type: "histogram",
+	opacity: 1,
+	marker: {
+     color: 'red',
+	},
+	name: "Experiment 4"
+	};
+	
+	var data = [trace1, trace2, trace3, trace4];
+	var layout = {barmode: "overlay",
+	title: 'Max Rounds Until The Game is Won', 
+		xaxis: {
+			title: 'Number of Rounds',
+			showline: true
+		}, 
+		yaxis: {
+			title: 'Frequency',
+			showline: true
+		}
+	};
+	Plotly.newPlot("myDiv", data, layout);
+}
+
+function moveRed()//This function will move red either up, down, left, or right 0,1,or 2 spaces
+{
+	if(red[column] == (userColumn - 1) && red[row] == 0 && didBlueWin)//This checks if red has won the game or if blue won the game
+	{
+		didRedWin = 0;//This changes the value of didRedWin to 0 so that we can stop our recursive call up in strange game 
+		//statistics();//This runs a function that outputs all of our stats to the screen for the user
+		endableUserInput();//This enables the page for user input now that the game has reached completion
+		return;
+ 	}
+	
+	if(red[round] >= 1000000)//This only happens if we some how complete 1million rounds without red winning
+	{
+		document.getElementById('p1').innerHTML = "Red has unsuccessful in reaching its destination";//This let the user know that red has lost the game
+		return;
+	}
+	
+	direction = pickDirection4Way();//This will grab a direction
+	numSteps = pickSteps();//This will pick how far red will move
+	if(direction == 1)//we move up
+	{
+		var tempRow = red[row];//This holds the row coordinate 
+		tempRow -= pickSteps();//This will generate the movement of red in the upward direction
+		if(isValidMoveUpDown(tempRow))
+		{
+			
+			red[round] += 1;//This increases the round counter as a round ends when red moves
+			red[row] = tempRow;//we now change the row position of red in the upwards direction 
+			if((blue[column] == red[column]) && (blue[row] == red[row]))//This checks if we landed on blue
+				sendBlueHome();//This sends blue home
+			
+		}
+		else
+		{
+			red[round] += 1;//we still increase the round counter even if we didn't move  
+		}
+	}
+	else if(direction == 2)//we move right
+	{
+		var tempColumn = red[column];//This takes the current column coordinate of red and puts it in a temp var
+		tempColumn += pickSteps();//This will generate the movement of red in the right direction
+		if(isValidMoveSideways(tempColumn))
+		{
+			
+			red[round] += 1;//This increase the round counter as the round ends when red moves
+			red[column] = tempColumn;//This will change the column of red in the right direction 
+			if((blue[column] == red[column]) && (blue[row] == red[row]))//This checks if we landed on blue
+				sendBlueHome();//This sends blue home
+			
+		}
+		else
+		{
+			red[round] += 1;//This increase the round counter even if we didn't move
+		}
+	}
+	else if(direction == 3)//we move down
+	{
+		var tempRow = red[row];//This holds the row coordinate 
+		tempRow += pickSteps();//This will generate the movement of red in the downward direction
+		if(isValidMoveUpDown(tempRow))
+		{
+			
+			red[round] += 1;//This increases the round counter as a round ends when red moves
+			red[row] = tempRow;//we now change the row position of red in the downward direction
+			if((blue[column] == red[column]) && (blue[row] == red[row]))//This checks if we landed on blue
+				sendBlueHome();//This sends blue home
+			 			
+		}
+		else
+		{
+			red[round] += 1;//we still increase the round counter even if we didn't move  
+		}
+	
+	}
+	else if(direction == 4)//we move left
+	{
+		var tempColumn = red[column];//This takes the current column coordinate of red and puts it in a temp var
+		tempColumn -= pickSteps();//This will generate the movement of red in the left direction
+		if(isValidMoveSideways(tempColumn))
+		{
+			
+			red[round] += 1;//This increase the round counter as the round ends when red moves
+			red[column] = tempColumn;//This will change the column of red in the left direction
+			if((blue[column] == red[column]) && (blue[row] == red[row]))//This checks if we landed on blue
+				sendBlueHome();//This sends blue home
+			 
+		}
+		else
+		{
+			red[round] += 1;//This increase the round counter even if we didn't move
+		}	
+	}
+
+}
+function moveRedDiagonally()
+{
+	if(red[column] == (userColumn - 1) && red[row] == 0 && didBlueWin)//This checks if red has won the game or if blue won the game
+	{
+		didRedWin = 0;//This changes the value of didRedWin to 0 so that we can stop our recursive call up in strange game 
+		//statistics();//This runs a function that outputs all of our stats to the screen for the user
+		endableUserInput();//This enables the page for user input now that the game has reached completion
+		return;
+ 	}
+	
+	if(red[round] >= 1000000)//This only happens if we some how complete 1million rounds without red winning
+	{
+		document.getElementById('p1').innerHTML = "Red has unsuccessful in reaching its destination";//This let the user know that red has lost the game
+		return;
+	}
+	
+	direction = pickDirection4Way();//This will grab a direction
+	numSteps = pickSteps();//This will pick how far red will move
+	
+	if(direction == 1)//we move NE
+	{
+		var tempRow = red[row];//This holds the row coordinate 
+		var tempColumn = red[column];//This holds the column coordinate
+		var shift = pickSteps();//This grabs the number of steps 
+		tempRow -= shift;//This will generate the movement of red in the upward direction
+		tempColumn += shift;//This will aid in the shift
+		if(isValidMoveDiagonally(tempRow,tempColumn))
+		{
+			
+			red[round] += 1;//This increases the round counter as a round ends when red moves
+			red[row] = tempRow;//we now change the row position of red in the upwards direction 
+			red[column] = tempColumn;//This will move the column part of our coordinate
+			if((blue[column] == red[column]) && (blue[row] == red[row]))//This checks if we landed on blue
+				sendBlueHome();//This sends blue home			
+		}
+		else
+		{
+			red[round] += 1;//we still increase the round counter even if we didn't move  
+		}
+	}
+	else if(direction == 2)//we move SE
+	{
+		var tempRow = red[row];//This holds the row coordinate 
+		var tempColumn = red[column];//This holds the column coordinate
+		var shift = pickSteps();//This grabs the number of steps 
+		tempRow += shift;//This will generate the movement of red in the upward direction
+		tempColumn += shift;//This will aid in the shift
+		if(isValidMoveDiagonally(tempRow,tempColumn))
+		{
+			
+			red[round] += 1;//This increases the round counter as a round ends when red moves
+			red[row] = tempRow;//we now change the row position of red in the upwards direction 
+			red[column] = tempColumn;//This will move the column part of our coordinate
+			if((blue[column] == red[column]) && (blue[row] == red[row]))//This checks if we landed on blue
+				sendBlueHome();//This sends blue home			
+		}
+		else
+		{
+			red[round] += 1;//we still increase the round counter even if we didn't move  
+		}
+	}
+	else if(direction == 3)//we move SW
+	{
+		var tempRow = red[row];//This holds the row coordinate 
+		var tempColumn = red[column];//This holds the column coordinate
+		var shift = pickSteps();//This grabs the number of steps 
+		tempRow += shift;//This will generate the movement of red in the upward direction
+		tempColumn -= shift;//This will aid in the shift
+		if(isValidMoveDiagonally(tempRow,tempColumn))
+		{
+			
+			red[round] += 1;//This increases the round counter as a round ends when red moves
+			red[row] = tempRow;//we now change the row position of red in the upwards direction 
+			red[column] = tempColumn;//This will move the column part of our coordinate
+			if((blue[column] == red[column]) && (blue[row] == red[row]))//This checks if we landed on blue
+				sendBlueHome();//This sends blue home			
+		}
+		else
+		{
+			red[round] += 1;//we still increase the round counter even if we didn't move  
+		}
+	}
+	else if(direction == 4)//we move NW
+	{
+		var tempRow = red[row];//This holds the row coordinate 
+		var tempColumn = red[column];//This holds the column coordinate
+		var shift = pickSteps();//This grabs the number of steps 
+		tempRow -= shift;//This will generate the movement of red in the upward direction
+		tempColumn -= shift;//This will aid in the shift
+		if(isValidMoveDiagonally(tempRow,tempColumn))
+		{
+			
+			red[round] += 1;//This increases the round counter as a round ends when red moves
+			red[row] = tempRow;//we now change the row position of red in the upwards direction 
+			red[column] = tempColumn;//This will move the column part of our coordinate
+			if((blue[column] == red[column]) && (blue[row] == red[row]))//This checks if we landed on blue
+				sendBlueHome();//This sends blue home			
+		}
+		else
+		{
+			red[round] += 1;//we still increase the round counter even if we didn't move  
+		}	
+	}
+}
+function moveBlueDiagonally()
+{
+	if(blue[column] == (0) && blue[row] == userRow-1 && didRedWin)//This checks if blue has won the game or if blue won the game
+	{
+		didBlueWin = 0;//This changes the value of didblueWin to 0 so that we can stop our recursive call up in strange game 
+		//statistics();//This runs a function that outputs all of our stats to the screen for the user
+		endableUserInput();//This enables the page for user input now that the game has reached completion
+		return;
+ 	}
+	
+	if(blue[round] >= 1000000)//This only happens if we some how complete 1million rounds without blue winning
+	{
+		document.getElementById('p1').innerHTML = "blue has unsuccessful in reaching its destination";//This let the user know that blue has lost the game
+		return;
+	}
+	
+	direction = pickDirection4Way();//This will grab a direction
+	numSteps = pickSteps();//This will pick how far blue will move
+	
+	if(direction == 1)//we move NE
+	{
+		var tempRow = blue[row];//This holds the row coordinate 
+		var tempColumn = blue[column];//This holds the column coordinate
+		var shift = pickSteps();//This grabs the number of steps 
+		tempRow -= shift;//This will generate the movement of blue in the upward direction
+		tempColumn += shift;//This will aid in the shift
+		
+		if(isValidMoveDiagonally(tempRow,tempColumn))
+		{
+			
+			blue[round] += 1;//This increases the round counter as a round ends when blue moves
+			blue[row] = tempRow;//we now change the row position of blue in the upwards direction 
+			blue[column] = tempColumn;//This will move the column part of our coordinate
+			if((blue[column] == red[column]) && (blue[row] == red[row]))//This checks if we landed on blue
+				sendRedHome();//This sends blue home			
+		}
+		else
+		{
+			blue[round] += 1;//we still increase the round counter even if we didn't move  
+		}
+	}
+	else if(direction == 2)//we move SE
+	{
+		var tempRow = blue[row];//This holds the row coordinate 
+		var tempColumn = blue[column];//This holds the column coordinate
+		var shift = pickSteps();//This grabs the number of steps 
+		tempRow += shift;//This will generate the movement of blue in the upward direction
+		tempColumn += shift;//This will aid in the shift
+		if(isValidMoveDiagonally(tempRow,tempColumn))
+		{
+			
+			blue[round] += 1;//This increases the round counter as a round ends when blue moves
+			blue[row] = tempRow;//we now change the row position of blue in the upwards direction 
+			blue[column] = tempColumn;//This will move the column part of our coordinate
+			if((blue[column] == red[column]) && (blue[row] == red[row]))//This checks if we landed on blue
+				sendRedHome();//This sends blue home			
+		}
+		else
+		{
+			blue[round] += 1;//we still increase the round counter even if we didn't move  
+		}
+	}
+	else if(direction == 3)//we move SW
+	{
+		var tempRow = blue[row];//This holds the row coordinate 
+		var tempColumn = blue[column];//This holds the column coordinate
+		var shift = pickSteps();//This grabs the number of steps 
+		tempRow += shift;//This will generate the movement of blue in the upward direction
+		tempColumn -= shift;//This will aid in the shift
+		if(isValidMoveDiagonally(tempRow,tempColumn))
+		{
+			
+			blue[round] += 1;//This increases the round counter as a round ends when blue moves
+			blue[row] = tempRow;//we now change the row position of blue in the upwards direction 
+			blue[column] = tempColumn;//This will move the column part of our coordinate
+			if((blue[column] == red[column]) && (blue[row] == red[row]))//This checks if we landed on blue
+				sendRedHome();//This sends blue home			
+		}
+		else
+		{
+			blue[round] += 1;//we still increase the round counter even if we didn't move  
+		}
+	}
+	else if(direction == 4)//we move NW
+	{
+		var tempRow = blue[row];//This holds the row coordinate 
+		var tempColumn = blue[column];//This holds the column coordinate
+		var shift = pickSteps();//This grabs the number of steps 
+		tempRow -= shift;//This will generate the movement of blue in the upward direction
+		tempColumn -= shift;//This will aid in the shift
+		if(isValidMoveDiagonally(tempRow,tempColumn))
+		{
+			
+			blue[round] += 1;//This increases the round counter as a round ends when blue moves
+			blue[row] = tempRow;//we now change the row position of blue in the upwards direction 
+			blue[column] = tempColumn;//This will move the column part of our coordinate
+			if((blue[column] == red[column]) && (blue[row] == red[row]))//This checks if we landed on blue
+				sendRedHome();//This sends blue home			
+		}
+		else
+		{
+			blue[round] += 1;//we still increase the round counter even if we didn't move  
+		}	
+	}
+}
+function moveBlue()//This function will move blue either up, down, left, or right 0,1,or 2 spaces
+{
+	if(didRedWin == 0)
+		return;
+		
+	if(blue[column] == (0) && blue[row] == userRow-1 && didRedWin)//This checks if blue has won the game and if red has won the game
+	{
+		didBlueWin = 0;//This changes the value of didRedWin to 0 so that we can stop our recursive call up in strange game 
+		//statistics();//This runs a function that outputs all of our stats to the screen for the user
+		endableUserInput();//This enables the page for user input now that the game has reached completion
+		return;
+ 	}
+	
+	if(blue[round] == 1000000)//This only happens if we some how complete 1million rounds without blue winning
+	{
+		document.getElementById('p1').innerHTML = "blue has unsuccessful in reaching its destination";//This let the user know that blue has lost the game
+		return;
+	}
+	
+	direction = pickDirection4Way();//This will grab a direction
+	numSteps = pickSteps();//This will pick how far blue will move
+	if(direction == 1)//we move up
+	{
+		var tempRow = blue[row];//This holds the row coordinate 
+		tempRow -= pickSteps();//This will generate the movement of blue in the upward direction
+		if(isValidMoveUpDown(tempRow))
+		{
+			
+			blue[round] += 1;//This increases the round counter as a round ends when blue moves
+			blue[row] = tempRow;//we now change the row position of blue in the upwards direction 
+			if((blue[column] == red[column]) && (blue[row] == red[row]))//This checks if we landed on red
+				sendRedHome();//This sends red home
+			
+		}
+		else
+		{
+			blue[round] += 1;//we still increase the round counter even if we didn't move  
+		}
+	}
+	else if(direction == 2)//we move right
+	{
+		var tempColumn = blue[column];//This takes the current column coordinate of blue and puts it in a temp var
+		tempColumn += pickSteps();//This will generate the movement of blue in the right direction
+		if(isValidMoveSideways(tempColumn))
+		{
+			
+			blue[round] += 1;//This increase the round counter as the round ends when blue moves
+			blue[column] = tempColumn;//This will change the column of blue in the right direction 
+			if((blue[column] == red[column]) && (blue[row] == red[row]))//This checks if we landed on red
+				sendRedHome();//This sends red home
+				
+		}
+		else
+		{
+			blue[round] += 1;//This increase the round counter even if we didn't move
+		}
+	}
+	else if(direction == 3)//we move down
+	{
+		var tempRow = blue[row];//This holds the row coordinate 
+		tempRow += pickSteps();//This will generate the movement of blue in the downward direction
+		if(isValidMoveUpDown(tempRow))
+		{
+			
+			blue[round] += 1;//This increases the round counter as a round ends when blue moves
+			blue[row] = tempRow;//we now change the row position of blue in the downward direction
+			if((blue[column] == red[column]) && (blue[row] == red[row]))//This checks if we landed on red
+				sendRedHome();//This sends red home			
+			 	
+		}
+		else
+		{
+			blue[round] += 1;//we still increase the round counter even if we didn't move  
+		}
+	
+	}
+	else if(direction == 4)//we move left
+	{
+		var tempColumn = blue[column];//This takes the current column coordinate of blue and puts it in a temp var
+		tempColumn -= pickSteps();//This will generate the movement of blue in the left direction
+		if(isValidMoveSideways(tempColumn))
+		{
+			
+			blue[round] += 1;//This increase the round counter as the round ends when blue moves
+			blue[column] = tempColumn;//This will change the column of blue in the left direction
+			if((blue[column] == red[column]) && (blue[row] == red[row]))//This checks if we landed on red
+				sendRedHome();//This sends red home
+			 	
+		}
+		else
+		{
+			blue[round] += 1;//This increase the round counter even if we didn't move
+		}	
+	}
+
+}
+function sendRedHome()
+{
+	red[sentHome] += 1;//This increases the amount of times red was sent home
+	
+	red[row] = userRow-1;//This resets red's row to its starting position
+	red[column] = 0;//This resets red's column to 0
+	
+}
+function sendBlueHome()
+{
+	blue[sentHome] += 1;//This increases the amount of times blue was sent home
+	
+	blue[column] = userColumn-1;//This resets blue's column to its starting position
+	blue[row] = 0;//This resets blue's row to 0
+	
+}
+function pickDirection4Way()//1 is up 2 is right 3 is down 4 is right ***OR*** 1 is NE 2 is SE 3 is SW 4 is NW
+{
+	return Math.floor((Math.random()*4)+1);
+}
+function pickDirection8Way()//1 is up 2 is right 3 is down 4 is right
+{
+	return Math.floor((Math.random()*8)+1);
+}
+function pickSteps()//This picks the number of steps
+{
+	return Math.floor((Math.random()*2));
+}
+function isValidMoveSideways(num)//this will be used as our bounds checker for a 10x10 board
+{
+	if(num < userColumn && num >= 0)
+		return true;
+	else
+		return false;
+}
+function isValidMoveUpDown(num)//this will be used as our bounds checker for a 10x10 board
+{
+	if(num < userRow && num >= 0)
+		return true;
+	else
+		return false;
+}
+function isValidMoveDiagonally(num1,num2)//num1 goes with rows num2 goes with columns to see if the diagonal move is valid or not
+{
+	if(num1 < userRow && num1 >= 0 && num2 < userColumn && num2 >= 0)
+		return true;
+	else
+		return false;
+}
+function disableUserInput()//This function disables the page from user input during game play
+{
+	document.getElementById("b1").innerHTML="Simulation Currently In Progress";//This changes our buttons text to show the user that it is currently running
+	document.getElementById("b1").disabled = true;//This is the button
+}
+function endableUserInput()//This function enables the page for user input after the simulation has ended
+{
+	document.getElementById("b1").innerHTML="Click Here To Run Simulation Again"; //This changes the button to tell the user to click here to run it again
+	document.getElementById("b1").disabled = false;//This is the button
+}
+function initializeGame()//This intializes the game
+{
+	clear();//This sets all of the global variables to their default values
+	userColumn = 10;//This just sets the board size to 10 now while leaving it open to become variable in the future
+	userRow = 10;//This just sets the board size to 10 now while leaving it open to become variable in the future
+	numRoundsEx1 = [gameNum];//This makes the array the count rounds per game for us in experiement 1
+	numRoundsEx2 = [gameNum];//This makes the array the count rounds per game for us in experiement 2
+	numRoundsEx3 = [gameNum];//This makes the array the count rounds per game for us in experiement 3
+	numRoundsEx4 = [gameNum];//This makes the array the count rounds per game for us in experiement 4
+	
+	if(userColumn >= 5 && userColumn <= 20 && userRow >= 5 && userRow <= 20)//This checks if the user gave us valid numbers to work with
+	{
+		disableUserInput();//This turns off the page for user input until the game has completed 
+		document.getElementById('error').innerHTML = "";//This clears the error paragraph incase it was filled with an error message to the user
+		red[row] = userRow - 1;//This sets reds coordinates to the correct location
+		blue[column] = userColumn-1;//This sets the coordinates of blue to the correct location
+		strangeGame();//This starts up the actual game being played
+	}
+	else//if they gave bad input it does nothing
+		document.getElementById('error').innerHTML = "Please provide valid numbers for simulation.";
+	
+}
+
+</script>
+<!-- Plotly.js -->
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script><!-- This is the open source source code location for the graphs used in this project -->
+</head>
+
+<body>
+<h2>The Strange Game Experiment!</h2>
+<p>
+	This is the Strange Game Experiment. In this experiment we have taken the Strange game you have come to know and twisted it into something more.<br>
+	We here at Strange Game Inc. have reshaped the game to with new and exciting twists! In this edition of the Strange Game it plays out as follows.<br>
+	We began with the familiar 10 by 10 board. Then we took both Red and Blue and placed them in their respective corners. Red is attempting to reach<br>
+	Blue's home base, and Blue is attempting to reach Red's home base. Red is still allowed to send Blue back home by landing on them, and Blue is allowed<br>
+	to send red home by landing on them. This is where we begin to deviate from the orignal strange game you have come to know and love. We decided<br>
+	that it would be interesting to give Red and Blue new ways to move around the board, and so the Strange Game Experiment was born! We have created a<br>
+	simulator that allows you to see the results of 4 different variations in the movement patern of Red and Blue. The first Experiment is the control.<br>
+	It only allows for basic up,down,left, and right movement from the players. In experiment 2 we have given both players diagonal movement. In experiment 3<br>
+	we have given the players up, down, left, right, and diagonal movement. Then in the final experiment we have given Red the ability to move diagonally<br>
+	and Blue the ability to move up, down, left, and right. We have set the simulation up to run 5000 games of for each experiment so that you can see<br>
+	the statistics more accurately. We here at Strange Game Inc. have found the results to be quite fascinating and hope that you do too.<br>
+	<b>Please Note:</b> You can turn on and off each experiment's data to more accurately compare the experiments.<br>
+	<h3>**Note** This Experiment can take quite a bit of time due to the number of simulations that are being run please be patient while it is running</h3>
+</p>
+
+<button id = "b1" type="button" onclick=initializeGame()>Click Here To Run Simulation</button><br><br>
+<p id = "error" ></p>
+<p id = "p1" ></p>
+<div id="myDiv" style="width: 1000px; height: 600px;"><!-- Plotly chart will be drawn inside this DIV --></div>
+</body>
+</html>
